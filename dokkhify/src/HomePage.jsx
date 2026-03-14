@@ -7,7 +7,7 @@ function HomePage({ goCourses, goLogin, goSignup, goTuition }) {
 
   return (
     <div>
-      
+
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
@@ -60,7 +60,7 @@ function HomePage({ goCourses, goLogin, goSignup, goTuition }) {
         </div>
       </section>
 
-      
+
     </div>
   );
 }

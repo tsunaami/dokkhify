@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 
-function LoginPage() {
+function LoginPage({ goHome, goSignup, setLoggedUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    alert(`Email: ${email}\nPassword: ${password}`);
+    const users = JSON.parse(localStorage.getItem("dokkhifyUsers")) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (!user) return alert("Invalid login");
+
+    localStorage.setItem("loggedUser", JSON.stringify(user));
+    setLoggedUser(user);
+    alert(`Login successful! Welcome ${user.name}`);
+    goHome();
   };
 
   return (
@@ -20,7 +28,7 @@ function LoginPage() {
         <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
 
         <button className="btn-login" type="submit">Login</button>
-        <p className="forgot">Forgot Password?</p>
+        <p>Don't have an account? <span onClick={goSignup} style={{cursor:"pointer", color:"blue"}}>Sign Up</span></p>
       </form>
     </section>
   );
