@@ -1,13 +1,23 @@
 import React, { useState } from "react";
 
-function SignupPage() {
+function SignupPage({ goHome, goLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
 
   const handleSignup = () => {
-    alert(`Name: ${name}\nEmail: ${email}\nPassword: ${password}\nRole: ${role}`);
+    const user = { name, email, password, role };
+    const users = JSON.parse(localStorage.getItem("dokkhifyUsers")) || [];
+
+    if (users.find(u => u.email === email)) {
+      return alert("Email already exists!");
+    }
+
+    users.push(user);
+    localStorage.setItem("dokkhifyUsers", JSON.stringify(users));
+    alert("Signup successful!");
+    goLogin(); // go to login after signup
   };
 
   return (
