@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 });
 
 // ── REGISTER ──────────────────────────────────────────
-app.post('/auth/register', requireDb, async (req, res) => {
+app.post('/api/auth/register', requireDb, async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
