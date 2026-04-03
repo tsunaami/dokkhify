@@ -46,7 +46,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div style={appShell}>
       <Navbar
         goHome={() => goPage('home')}
         goCourses={goCourses}
@@ -59,40 +59,41 @@ function App() {
         goPrivacy={() => goPage('privacy')}
       />
 
-      {/* Pages */}
-      {page === 'home' && (
-        <HomePage
-          goCourses={goCourses}
-          goStudentDashboard={goStudentDashboard}
-          loggedUser={loggedUser}
-        />
-      )}
-      {page === 'courses' && loggedUser?.role === 'student' && (
-        <CoursesPage goStudentDashboard={goStudentDashboard} />
-      )}
-      {page === 'student-dashboard' && loggedUser?.role === 'student' && (
-        <StudentDashboard />
-      )}
-      {page === 'dashboard' && loggedUser?.role === 'instructor' && (
-        <InstructorDashboard />
-      )}
-      {page === 'login' && (
-        <LoginPage
-          goHome={() => goPage('home')}
-          goSignup={() => goPage('signup')}
-          setLoggedUser={setLoggedUser}
-        />
-      )}
-      {page === 'signup' && (
-        <SignupPage
-          goHome={() => goPage('home')}
-          goLogin={() => goPage('login')}
-          setLoggedUser={setLoggedUser}
-        />
-      )}
-      {page === 'tuition' && <TuitionPage />}
-      {page === 'about' && <AboutPage goBack={goBack} />}
-      {page === 'privacy' && <PrivacyPage goBack={goBack} />}
+      <main style={pageShell}>
+        {page === 'home' && (
+          <HomePage
+            goCourses={goCourses}
+            goStudentDashboard={goStudentDashboard}
+            loggedUser={loggedUser}
+          />
+        )}
+        {page === 'courses' && loggedUser?.role === 'student' && (
+          <CoursesPage goStudentDashboard={goStudentDashboard} />
+        )}
+        {page === 'student-dashboard' && loggedUser?.role === 'student' && (
+          <StudentDashboard />
+        )}
+        {page === 'dashboard' && loggedUser?.role === 'instructor' && (
+          <InstructorDashboard />
+        )}
+        {page === 'login' && (
+          <LoginPage
+            goHome={() => goPage('home')}
+            goSignup={() => goPage('signup')}
+            setLoggedUser={setLoggedUser}
+          />
+        )}
+        {page === 'signup' && (
+          <SignupPage
+            goHome={() => goPage('home')}
+            goLogin={() => goPage('login')}
+            setLoggedUser={setLoggedUser}
+          />
+        )}
+        {page === 'tuition' && <TuitionPage />}
+        {page === 'about' && <AboutPage goBack={goBack} />}
+        {page === 'privacy' && <PrivacyPage goBack={goBack} />}
+      </main>
 
       <Footer
         goAbout={() => goPage('about')}
@@ -101,5 +102,17 @@ function App() {
     </div>
   );
 }
+
+const appShell = {
+  minHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+const pageShell = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+};
 
 export default App;
