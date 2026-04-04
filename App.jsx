@@ -1,118 +1,107 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import HomePage from './HomePage';
 import CoursesPage from './CoursesPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
-import TuitionPage from './TuitionPage';
 import InstructorDashboard from './InstructorDashboard';
-import StudentDashboard from './StudentDashboard'; // <-- new
+import StudentDashboard from './StudentDashboard';
+import AdminDashboard from './AdminDashboard';
 import AboutPage from './AboutPage';
 import PrivacyPage from './PrivacyPage';
+import TuitionPage from './TuitionPage';
 
 function App() {
-  const [page, setPage] = useState('home');
-  const [prevPage, setPrevPage] = useState(null);
   const [loggedUser, setLoggedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = JSON.parse(
-      localStorage.getItem('authUser') || localStorage.getItem('loggedUser')
+      localStorage.getItem('loggedUser') || localStorage.getItem('authUser') || 'null'
     );
     setLoggedUser(user);
+    setLoading(false);
   }, []);
 
-  const goPage = (newPage) => {
-    setPrevPage(page);
-    setPage(newPage);
+  const handleLogout = () => {
+    localStorage.removeItem('loggedUser');
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('token');
+    setLoggedUser(null);
   };
 
-  const goBack = () => {
-    if (prevPage) setPage(prevPage);
-  };
-
-  const goCourses = () => {
-    if (loggedUser?.role === 'student') goPage('courses');
-    else if (loggedUser?.role === 'instructor') goPage('dashboard');
-  };
-
-  const goDashboard = () => {
-    if (loggedUser?.role === 'instructor') goPage('dashboard');
-  };
-
-  const goStudentDashboard = () => {
-    if (loggedUser?.role === 'student') goPage('student-dashboard');
-  };
+  if (loading) return null;
 
   return (
-    <div style={appShell}>
-      <Navbar
-        goHome={() => goPage('home')}
-        goCourses={goCourses}
-        goDashboard={goDashboard}
-        goStudentDashboard={goStudentDashboard} // <-- added
-        goLogin={() => goPage('login')}
-        goSignup={() => goPage('signup')}
-        goTuition={() => goPage('tuition')}
-        goAbout={() => goPage('about')}
-        goPrivacy={() => goPage('privacy')}
-      />
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col bg-[#0f0a0b]">
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: { background: '#1a0f12', color: '#f0ece8', border: '1px solid #6B0F1A' },
+          }}
+        />
+        <Navbar loggedUser={loggedUser} handleLogout={handleLogout} />
 
-      <main style={pageShell}>
-        {page === 'home' && (
-          <HomePage
-            goCourses={goCourses}
-            goStudentDashboard={goStudentDashboard}
-            loggedUser={loggedUser}
-          />
-        )}
-        {page === 'courses' && loggedUser?.role === 'student' && (
-          <CoursesPage goStudentDashboard={goStudentDashboard} />
-        )}
-        {page === 'student-dashboard' && loggedUser?.role === 'student' && (
-          <StudentDashboard />
-        )}
-        {page === 'dashboard' && loggedUser?.role === 'instructor' && (
-          <InstructorDashboard />
-        )}
-        {page === 'login' && (
-          <LoginPage
-            goHome={() => goPage('home')}
-            goSignup={() => goPage('signup')}
-            setLoggedUser={setLoggedUser}
-          />
-        )}
-        {page === 'signup' && (
-          <SignupPage
-            goHome={() => goPage('home')}
-            goLogin={() => goPage('login')}
-            setLoggedUser={setLoggedUser}
-          />
-        )}
-        {page === 'tuition' && <TuitionPage />}
-        {page === 'about' && <AboutPage goBack={goBack} />}
-        {page === 'privacy' && <PrivacyPage goBack={goBack} />}
-      </main>
+        <main className="flex-1 flex flex-col">
+          <Routes>
+            <Route path="/" element={<HomePage loggedUser={loggedUser} />} />
+            <Route path="/courses" element={<CoursesPage loggedUser={loggedUser} />} />
+            
+            {/* Auth Routes */}
+            <Route 
+              path="/login" 
+              element={!loggedUser ? <LoginPage setLoggedUser={setLoggedUser} /> : <Navigate to="/" />} 
+            />
+            <Route 
+              path="/signup" 
+              element={!loggedUser ? <SignupPage setLoggedUser={setLoggedUser} /> : <Navigate to="/" />} 
+            />
 
-      <Footer
-        goAbout={() => goPage('about')}
-        goPrivacy={() => goPage('privacy')}
-      />
-    </div>
+            {/* Protected Dashboard Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                loggedUser?.role === 'instructor' 
+                  ? <InstructorDashboard loggedUser={loggedUser} /> 
+                  : <Navigate to="/login" />
+              } 
+            />
+            <Route 
+              path="/my-learning" 
+              element={
+                loggedUser?.role === 'student' 
+                  ? <StudentDashboard loggedUser={loggedUser} /> 
+                  : <Navigate to="/login" />
+              } 
+            />
+            
+            <Route 
+              path="/admin" 
+              element={
+                loggedUser?.role === 'admin' 
+                  ? <AdminDashboard /> 
+                  : <Navigate to="/login" />
+              } 
+            />
+
+            {/* Static Content Routes */}
+            <Route path="/tuition" element={<TuitionPage />} />
+            <Route path="/about-us" element={<AboutPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
-
-const appShell = {
-  minHeight: '100vh',
-  display: 'flex',
-  flexDirection: 'column',
-};
-
-const pageShell = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-};
 
 export default App;
