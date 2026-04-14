@@ -13,7 +13,8 @@ import AdminDashboard from './AdminDashboard';
 import AboutPage from './AboutPage';
 import PrivacyPage from './PrivacyPage';
 import TuitionPage from './TuitionPage';
-
+import PaymentResult from './PaymentResult';
+import CarbonFootprintDisplay from './CarbonFootprintDisplay';
 function App() {
   const [loggedUser, setLoggedUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +100,7 @@ function App() {
         </main>
 
         <Footer />
+        <CarbonFootprintDisplay />
       </div>
     </BrowserRouter>
   );
